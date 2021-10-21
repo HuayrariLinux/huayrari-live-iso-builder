@@ -1,12 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-
-# Install vagrant-disksize to allow resizing the vagrant box disk.
-unless Vagrant.has_plugin?("vagrant-disksize")
-    raise  Vagrant::Errors::VagrantError.new, "vagrant-disksize plugin is missing. Please install it using 'vagrant plugin install vagrant-disksize' and rerun 'vagrant up'"
-end
-
 Vagrant.configure("2") do |config|
 
   # Debian GNU/Linux 10
@@ -19,15 +13,27 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
      vb.gui = false
      vb.memory = "4096"
+     vb.name = "huayrari-iso"
+
+     unless File.exist?("huayrari-iso-disk.vdi")
+        vb.customize ['createhd',
+                           '--filename', "huayrari-iso-disk",
+                           '--size', "10240"]
+        vb.customize ['storageattach', :id,
+                           '--storagectl', 'SATA Controller',
+                           '--port', 1,
+                           '--device', 0,
+                           '--type', 'hdd',
+                           '--medium', "huayrari-iso-disk.vdi"]
+      end
+ 
   end
-  config.disksize.size = '30GB'
   config.vm.synced_folder ".", "/vagrant", disabled: "true"
 
   # Provision
   config.vm.provision "shell", name: "base", path: "provision/base.sh", privileged: true
 
   # Sólo habilitar luego de aprovisionar la máquina - puede dar errores al inicio.
-  #config.vm.synced_folder "src/web", "/var/www/html/itop", type: "rsync", owner: "vagrant", group: "apache"
-
+  config.vm.synced_folder "./", "/opt/huayrari", type: "rsync", owner: "vagrant", group: "vagrant"
 
 end
