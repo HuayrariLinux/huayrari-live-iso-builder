@@ -12,13 +12,13 @@ Vagrant.configure("2") do |config|
   # VM resources
   config.vm.provider "virtualbox" do |vb|
      vb.gui = false
-     vb.memory = "4096"
-     vb.name = "huayrari-iso"
+     vb.memory = "2048"
+     vb.name = "huayrari-build"
   end
   config.vm.synced_folder ".", "/vagrant", disabled: "true"
 
   # Provision
   config.vm.provision "shell", name: "base", path: "provision/base.sh", privileged: true
-  
-  config.vm.synced_folder "live-build", "/opt/live-build"
+  config.vm.provision "shell", name: "cockpit", path: "provision/cockpit.sh", privileged: true
+  config.vm.provision "shell", name: "cockpit", path: "provision/live-build.sh", privileged: true
 end

@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -e
+
+lb clean noauto "${@}"
+
+# Eliminando paquetes de debug
+rm -f config/package-lists/debug.list.chroot
+
+# Limpiando configs y log
+rm -f config/binary config/bootstrap config/chroot config/common config/source
+rm -f build.log
+
+# limpiando archivos generados por templates
+rm -f config/includes.binary/isolinux/live.cfg
+rm -f config/includes.binary/isolinux/menu.cfg
+
+#limpieza de proposed
+rm -f config/archives/proposed.list.chroot
+rm -f config/archives/proposed.list.binary
+
+#limpieza de torbellino
+rm -f config/archives/torbellino.list.chroot
+rm -f config/archives/torbellino.list.binary
+
+#limpieza de artefactos
+rm -f huayra-${ARCH}-*.build.log
+rm -f huayra-${ARCH}-*.chroot.packages.live 
+rm -f huayra-${ARCH}-*.iso
+rm -f huayra-${ARCH}-*.chroot.files
+rm -f huayra-${ARCH}-*.contents
+rm -f huayra-${ARCH}-*.iso.md5
+rm -f huayra-${ARCH}-*.chroot.packages.install
+rm -f huayra-${ARCH}-*.files
+rm -f huayra-${ARCH}-*.packages

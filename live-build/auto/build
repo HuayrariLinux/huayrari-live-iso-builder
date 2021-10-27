@@ -1,0 +1,82 @@
+#!/bin/bash
+
+set -e
+
+BUILD_DATE=`date`
+BUILD_TIMESTAMP=`date +%Y%m%d%H%M`
+BUILD_VERSION=$BUILD_TIMESTAMP
+PROJECT_NAME="huayra-$ARCH"
+
+if [ ! -z "$RELEASE_VERSION" ]; then
+    BUILD_VERSION="$RELEASE_VERSION"
+fi
+
+#
+# Habilitamos paquetes para los desarrolladores
+#
+rm -f config/packages-lists/debug.list-chroot
+if [ "$DEBUG" = "1" ];then
+    echo "virtualbox-guest-x11" >>config/package-lists/debug.list.chroot
+    echo "virtualbox-guest-dkms" >>config/package-lists/debug.list.chroot
+    echo "open-vm-tools-desktop" >>config/package-lists/debug.list.chroot
+    echo "open-vm-tools-dkms" >>config/package-lists/debug.list.chroot
+fi
+#
+# helper para usar archivos de plantillas
+#
+function tpl {
+    # $origen es relativo a config/templates
+    origen=$1
+    # $destino es relativo a la raiz del proyecto (donde se encuentraq el direction config)
+    destino=$2
+    cat config/templates/$origen | sed -e "s/{{VERSION}}/$RELEASE_VERSION/" -e "s/{{ARCH}}/$ARCH/" > $destino
+}
+
+# Archivo BUILD
+echo "Versión: $BUILD_VERSION" > config/includes.binary/BUILD
+echo $BUILD_DATE >> config/includes.binary/BUILD
+cp -vf config/includes.binary/BUILD config/includes.chroot/BUILD
+
+# Templates al binary
+tpl isolinux/menu.cfg config/includes.binary/isolinux/menu.cfg
+tpl isolinux/live-$ARCH.cfg config/includes.binary/isolinux/live.cfg
+tpl README config/includes.binary/README
+
+#proposed (hacer una iso con proposed)
+if [ "$PROPOSED" = "1" ]; then
+  echo '# Repositorio de Huayra GNU/Linux (proposed)' > config/archives/proposed.list.binary
+  echo 'deb http://repo.huayra.educar.gob.ar/huayra austral-proposed main contrib non-free' >> config/archives/proposed.list.binary
+  echo 'deb-src http://repo.huayra.educar.gob.ar/huayra austral-proposed main contrib non-free' >>config/archives/proposed.list.binary
+  cp config/archives/proposed.list.binary config/archives/proposed.list.chroot
+fi
+
+#torbellino (hacer una iso con torbellino)
+if [ "$TORBELLINO" = "1" ]; then
+  echo '# Repositorio de Huayra GNU/Linux (torbellino)' > config/archives/torbellino.list.binary
+  echo 'deb http://repo.huayra.educar.gob.ar/huayra torbellino main contrib non-free' >> config/archives/torbellino.list.binary
+  echo 'deb-src http://repo.huayra.educar.gob.ar/huayra torbellino main contrib non-free' >> config/archives/torbellino.list.binary
+  cp config/archives/torbellino.list.binary config/archives/torbellino.list.chroot
+fi
+
+
+lb build noauto "${@}" 2>&1 | tee build.log
+if [ -f live-image-$ARCH.hybrid.iso ]; then
+  mv live-image-$ARCH.hybrid.iso $PROJECT_NAME-$BUILD_VERSION.iso
+  mv live-image-$ARCH.contents $PROJECT_NAME-$BUILD_VERSION.contents
+  mv live-image-$ARCH.packages $PROJECT_NAME-$BUILD_VERSION.packages
+  mv live-image-$ARCH.files $PROJECT_NAME-$BUILD_VERSION.files
+  mv chroot.files $PROJECT_NAME-$BUILD_VERSION.chroot.files
+  mv chroot.packages.install $PROJECT_NAME-$BUILD_VERSION.chroot.packages.install
+  mv chroot.packages.live $PROJECT_NAME-$BUILD_VERSION.chroot.packages.live
+  mv build.log $PROJECT_NAME-$BUILD_VERSION.build.log
+  md5sum $PROJECT_NAME-$BUILD_VERSION.iso > $PROJECT_NAME-$BUILD_VERSION.iso.md5
+else
+  test -f live-image-$ARCH.contents && mv live-image-$ARCH.contents $PROJECT_NAME-$BUILD_VERSION.contents.error
+  test -f live-image-$ARCH.packages && mv live-image-$ARCH.packages $PROJECT_NAME-$BUILD_VERSION.packages.error
+  test -f build.log && mv build.log $PROJECT_NAME-$BUILD_VERSION.build.log.error
+  test -f live-image-$ARCH.files && mv live-image-$ARCH.files $PROJECT_NAME-$BUILD_VERSION.files.error
+  test -f chroot.files && mv chroot.files $PROJECT_NAME-$BUILD_VERSION.chroot.files.error
+  test -f chroot.packages.install && mv chroot.packages.install $PROJECT_NAME-$BUILD_VERSION.chroot.packages.install.error
+  test -f chroot.packages.live && mv chroot.packages.live $PROJECT_NAME-$BUILD_VERSION.chroot.packages.live.error
+fi
+
