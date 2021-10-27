@@ -1,0 +1,18 @@
+# Paquetes que serán la base del sistema
+########################################
+
+task-lxde-desktop
+sudo
+vim-nox
+user-setup
+locales
+laptop-detect
+gnupg2 
+man-db
+manpages-es
+pulseaudio-module-bluetooth
+python-qt4
+tree
+unrar-free
+midori
+user-setup
