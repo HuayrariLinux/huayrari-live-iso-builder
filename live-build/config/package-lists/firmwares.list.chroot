@@ -4,3 +4,5 @@ firmware-linux
 firmware-linux-nonfree
 firmware-misc-nonfree
 firmware-intel-sound
+firmware-rtw88
+rtw88-dkms
