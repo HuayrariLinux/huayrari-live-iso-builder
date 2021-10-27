@@ -22,8 +22,12 @@ Para mayor información leer el manual de live-build (http://live.debian.net/)
 * EFI: Valor 1 para crear una iso con los paquetes grub-efi en vez de grub-pc
 * PROPOSED: Valor 1 para agregar repos proposed (por lo general para pruebas de actualizaciones)
 
-  ARCH=amd64 CACHER=127.0.0.1:3142 RELEASE_VERSION=2.0beta DEBUG=1 EFI=1 PROPOSED=1 lb config
-  ARCH=amd64 CACHER=127.0.0.1:3142 RELEASE_VERSION=2.0beta DEBUG=1 EFI=1 PROPOSED=1 lb build
+Ejemplo:
+
+```
+root@buster:/opt/huayrari-live-iso-builder# ARCH=amd64 CACHER=127.0.0.1:3142 RELEASE_VERSION=2.0beta DEBUG=1 EFI=1 PROPOSED=1 lb config
+root@buster:/opt/huayrari-live-iso-builder# ARCH=amd64 CACHER=127.0.0.1:3142 RELEASE_VERSION=2.0beta DEBUG=1 EFI=1 PROPOSED=1 lb build
+```
 
 ## Limpieza del entorno
 
