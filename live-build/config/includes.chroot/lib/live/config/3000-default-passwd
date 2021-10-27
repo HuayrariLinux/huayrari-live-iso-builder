@@ -1,5 +1,5 @@
 #!/bin/bash
 
-echo "Configurando claves por defecto de Huayrari GNU/Linux..."
+echo " Claves por defecto de huayra "
 echo "root:estudiante" | chpasswd
 echo "estudiante:estudiante" | chpasswd
