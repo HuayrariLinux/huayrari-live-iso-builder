@@ -16,13 +16,11 @@ fi
 #
 rm -f config/packages-lists/debug.list-chroot
 if [ "$DEBUG" = "1" ];then
-    echo "virtualbox-guest-x11" >>config/package-lists/debug.list.chroot
     echo "virtualbox-guest-dkms" >>config/package-lists/debug.list.chroot
-    echo "open-vm-tools-desktop" >>config/package-lists/debug.list.chroot
-    echo "open-vm-tools-dkms" >>config/package-lists/debug.list.chroot
+    echo "virtualbox-guest-utils" >>config/package-lists/debug.list.chroot
 fi
 #
-# helper para usar archivos de plantillas
+# helper para usar archivos de plantillass
 #
 function tpl {
     # $origen es relativo a config/templates
@@ -49,15 +47,6 @@ if [ "$PROPOSED" = "1" ]; then
   echo 'deb-src http://repo.huayra.educar.gob.ar/huayra austral-proposed main contrib non-free' >>config/archives/proposed.list.binary
   cp config/archives/proposed.list.binary config/archives/proposed.list.chroot
 fi
-
-#torbellino (hacer una iso con torbellino)
-if [ "$TORBELLINO" = "1" ]; then
-  echo '# Repositorio de Huayra GNU/Linux (torbellino)' > config/archives/torbellino.list.binary
-  echo 'deb http://repo.huayra.educar.gob.ar/huayra torbellino main contrib non-free' >> config/archives/torbellino.list.binary
-  echo 'deb-src http://repo.huayra.educar.gob.ar/huayra torbellino main contrib non-free' >> config/archives/torbellino.list.binary
-  cp config/archives/torbellino.list.binary config/archives/torbellino.list.chroot
-fi
-
 
 lb build noauto "${@}" 2>&1 | tee build.log
 if [ -f live-image-$ARCH.hybrid.iso ]; then
